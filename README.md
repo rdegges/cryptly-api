@@ -83,7 +83,7 @@ After making a request, you'll receive a JSON response like the following:
 
 ``` json
 {
-  "password": "$2a$10$/R3Mxxcb1k4WaAAx7xwMPeWGINIm2YTdlAH3jEyjHgid21IUGL/ra"
+  "hash": "$2a$10$/R3Mxxcb1k4WaAAx7xwMPeWGINIm2YTdlAH3jEyjHgid21IUGL/ra"
 }
 ```
 
