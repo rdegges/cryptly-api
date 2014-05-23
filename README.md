@@ -79,6 +79,14 @@ The optional keys are:
   provide a high cost factor which is sufficiently strong for each hashing
   algorithm.
 
+After making a request, you'll receive a JSON response like the following:
+
+``` json
+{
+  "password": "$2a$10$/R3Mxxcb1k4WaAAx7xwMPeWGINIm2YTdlAH3jEyjHgid21IUGL/ra"
+}
+```
+
 
   [cryptly]: https://cryptly.org "cryptly - Crypto As a Service!"
   [github repo]: https://github.com/rdegges/cryptly-api "cryptly API on Github"
