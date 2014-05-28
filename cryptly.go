@@ -14,17 +14,16 @@ func main() {
 		EnableRelaxedContentType: true,
 	}
 	handler.SetRoutes(
-		&rest.Route{"POST", "/hash", Hash},
+		&rest.Route{"POST", "/hashes", Hash},
 	)
 	http.ListenAndServe(":8080", &handler)
 }
 
-// JSON payload a user must send to the API service when requesting a password
-// hash.
+// JSON payload a user must send to the API service when requesting a hash.
 type HashRequest struct {
-	Type     string              `json:"type"`
-	Password string              `json:"password"`
-	Options  *HashRequestOptions `json:"options"`
+	Type    string              `json:"type"`
+	String  string              `json:"string"`
+	Options *HashRequestOptions `json:"options"`
 }
 
 // This struct contains all possible hashing options for the various hashing
@@ -41,8 +40,7 @@ type HashRequestOptions struct {
 	HashSize int `json:"hash_size"`
 }
 
-// JSON payload returned to a user after successfully computing a password
-// hash.
+// JSON payload returned to a user after successfully computing a hash.
 type HashResponse struct {
 	Hash string `json:"hash"`
 }
@@ -59,7 +57,7 @@ var DefaultHashRequestOptions = HashRequestOptions{
 	HashSize: 32,
 }
 
-// Generate a password hash.
+// Generate a hash.
 func Hash(w rest.ResponseWriter, r *rest.Request) {
 
 	// The response we'll eventually send back to the user.
@@ -82,9 +80,9 @@ func Hash(w rest.ResponseWriter, r *rest.Request) {
 		return
 	}
 
-	// Ensure the user has specified a value for the password field.
-	if hr.Password == "" {
-		rest.Error(w, "The password field is required.", http.StatusBadRequest)
+	// Ensure the user has specified a value for the string field.
+	if hr.String == "" {
+		rest.Error(w, "The string field is required.", http.StatusBadRequest)
 		return
 	}
 
@@ -112,7 +110,7 @@ func Hash(w rest.ResponseWriter, r *rest.Request) {
 
 }
 
-// Generate a bcrypt hash given a password.
+// Generate a bcrypt hash given a request.
 func GenerateBcryptHash(hr *HashRequest) (*HashResponse, error) {
 
 	// First, grab the hash options and either use what the user specified or
@@ -128,10 +126,10 @@ func GenerateBcryptHash(hr *HashRequest) (*HashResponse, error) {
 		hr.Options.Cost = bcrypt.DefaultCost
 	}
 
-	// Compute the bcrypt password hash.
-	hash, err := bcrypt.GenerateFromPassword([]byte(hr.Password), hr.Options.Cost)
+	// Compute the bcrypt hash.
+	hash, err := bcrypt.GenerateFromPassword([]byte(hr.String), hr.Options.Cost)
 	if err != nil {
-		return nil, errors.New("Could not compute the bcrypt password hash.")
+		return nil, errors.New("Could not compute the bcrypt hash.")
 	}
 
 	// Send our response to the user.
@@ -139,7 +137,7 @@ func GenerateBcryptHash(hr *HashRequest) (*HashResponse, error) {
 
 }
 
-// Generate a scrypt hash given a password.
+// Generate a scrypt hash given a request.
 func GenerateScryptHash(hr *HashRequest) (*HashResponse, error) {
 
 	// First, grab the hash options and either use what the user specified or
@@ -157,10 +155,10 @@ func GenerateScryptHash(hr *HashRequest) (*HashResponse, error) {
 		HashSize: hr.Options.HashSize,
 	}
 
-	// Compute the scrypt password hash.
-	hash, err := uscrypt.HashPassword([]byte(hr.Password), &config)
+	// Compute the scrypt hash.
+	hash, err := uscrypt.HashPassword([]byte(hr.String), &config)
 	if err != nil {
-		return nil, errors.New("Could not compute the scrypt password hash.")
+		return nil, errors.New("Could not compute the scrypt hash.")
 	}
 
 	// Send our response to the user.
